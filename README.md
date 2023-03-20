@@ -1,4 +1,4 @@
-Lunar Chatbot
+
 Lunar Chatbot is a Python-based chatbot that uses OpenAI API and Rasa NLU model to provide AI-powered conversation. It also features language detection and translation using Google Translate API.
 
 Requirements:
