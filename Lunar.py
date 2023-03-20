@@ -10,7 +10,7 @@ from rasa.engine.storage import ModelStorage
 
 # Setup OpenAI API credentials
 openai.api_key = "API_KEY_HERE"
-bot_name = "Alteclipse"
+bot_name = "INPUT_BOT_NAME_HERE"
 
 # Setup translation API credentials
 translator = Translator(service_urls=['translate.google.com'])
