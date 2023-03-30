@@ -29,7 +29,7 @@ Lunar is a Discord chatbot built with OpenAI's API and Rasa that can perform var
 
 ## Contributors
 - Alteclipse
-- Other contributors (if applicable)
+
 
 ## License
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
