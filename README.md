@@ -1,31 +1,35 @@
-About:
-Lunar Chatbot is a Python-based chatbot that uses OpenAI API and Rasa NLU model to provide AI-powered conversation. It also features language detection and translation using Google Translate API.
+# Lunar
 
-Requirements:
-To use Lunar Chatbot, you need to have the following:
+Lunar is a Discord chatbot built with OpenAI's API and Rasa that can perform various tasks such as generating responses based on user inputs, translating text, and telling jokes. 
 
-OpenAI API credentials
-Google Translate API credentials
-Discord account
-Rasa NLU model ensure to train the model after installation using rasa train
+## Prerequisites
+- latest version of python
+- OpenAI API credentials
+- Discord bot token
 
-Installation:
-Clone the repository:
-git clone https://github.com/yourusername/lunar-chatbot.git
-Install the required libraries:
+## Installation
+1. Clone the repository: `git clone https://github.com/your-username/lunar.git`
+2. Install the required packages: `pip install -r requirements.txt`
+3. Set up your OpenAI API credentials and Discord bot token in `main.py`
+4. Train a Rasa model and store it in the `models/nlu` directory using rasa.train.
 
-Copy code:
-pip install -r requirements.txt
-Set up your OpenAI API and Google Translate API credentials in the config.py file.
+## Usage
+1. Run the bot: `python main.py`
+2. Start chatting with the bot in a Discord channel where the bot is present
 
-Run the bot:
-python bot.py
+## Features
+- Generates AI responses using Rasa based on the user's input
+- Translates text to a specified language using Google Translate API
+- Tells jokes using the PyJokes library
 
-Usage:
-To use Lunar Chatbot, mention its name (@Lunar) in a Discord channel and start chatting!
+## Future Work
+- Add more functionality to the bot, such as providing weather updates or news summaries
+- Improve the accuracy of the language detection and translation capabilities
+- Refactor the code to improve modularity and scalability
 
-Contributing:
-If you'd like to contribute to Lunar Chatbot, please fork the repository and create a pull request.
+## Contributors
+- Alteclipse
+- Other contributors (if applicable)
 
-License:
-This project is licensed under the MIT License - see the LICENSE file for details.
+## License
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
