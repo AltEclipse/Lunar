@@ -7,12 +7,9 @@ from bs4 import BeautifulSoup
 import discord
 from discord.ext import commands
 from googletrans import Translator
-from rasa.engine import loader
-from rasa.engine.storage import ModelStorage
+from rasa.nlu.model import Interpreter
 from langdetect import detect
 import pyjokes
-import rasa.core.run
-from rasa.core.agent import Agent
 import random
 
 # Setup OpenAI API credentials
@@ -25,6 +22,9 @@ translator = Translator(service_urls=['translate.google.com'])
 # Load Rasa model
 model_directory = "./models/nlu"
 interpreter = Interpreter.load(model_directory)
+
+# Create a new Discord client
+client = discord.Client()
 
 # Function to detect the language of the text
 def detect_lang(text):
@@ -91,6 +91,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    # Check if bot's name is mentioned in the message
+    if client.user.mentioned_in(message):
+        # Remove bot's name from the message and remove leading/tr
     # Check if bot's name is mentioned in the message
     if client.user.mentioned_in(message):
         # Remove bot's name from the message and remove leading/trailing white space
