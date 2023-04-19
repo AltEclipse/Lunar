@@ -120,4 +120,5 @@ async def on_message(message):
         await message.channel.send(joke)
 
 # Run the bot
-client.run(os.getenv("DISCORD_TOKEN"))
+client.run("your_discord_token_here")
+
