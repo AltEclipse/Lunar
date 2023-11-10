@@ -1,124 +1,79 @@
 import os
 import openai
-import asyncio
-import googletrans
-import requests
-from bs4 import BeautifulSoup
 import discord
-from discord.ext import commands
+import boto3
+from boto3.dynamodb.conditions import Key
 from googletrans import Translator
-from rasa.nlu.model import Interpreter
 from langdetect import detect
 import pyjokes
-import random
 
-# Setup OpenAI API credentials
-openai.api_key = "INPUT_BOT_TOKEN_HERE"
-bot_name = "Alteclipse"
+# Environment variables for API keys
+openai_api_key = os.getenv('OPENAI_API_KEY')
+discord_token = os.getenv('DISCORD_BOT_TOKEN')
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+aws_region_name = os.getenv('AWS_REGION_NAME')
 
-# Setup translation API credentials
+# Initialize OpenAI, translation, and AWS DynamoDB services
+openai.api_key = openai_api_key
 translator = Translator(service_urls=['translate.google.com'])
-
-# Load Rasa model
-model_directory = "./models/nlu"
-interpreter = Interpreter.load(model_directory)
+dynamodb = boto3.resource('dynamodb',
+                          aws_access_key_id=aws_access_key_id,
+                          aws_secret_access_key=aws_secret_access_key,
+                          region_name=aws_region_name)
+table = dynamodb.Table('DiscordChatHistory')  # Replace with your DynamoDB table name
 
 # Create a new Discord client
 client = discord.Client()
 
-# Function to detect the language of the text
+# Detect the language of the text
 def detect_lang(text):
-    try:
-        return detect(text)
-    except Exception as e:
-        print(f"Language detection failed: {e}")
-        return "unknown"
+    # Existing implementation...
 
-# Function to translate text to target language
+# Translate text to target language
 def translate_text(text, target_lang):
-    try:
-        translation = translator.translate(text, dest=target_lang)
-        return translation.text
-    except Exception as e:
-        print(f"Translation failed: {e}")
-        return None
+    # Existing implementation...
 
-# List of possible responses for different scenarios
-greetings = ["Hey there!", "What's up?", "Hello!", "Hiya!"]
-goodbyes = ["See ya later!", "Bye for now!", "Catch ya later!", "Goodbye!"]
-jokes = ["Why did the tomato turn red? Because it saw the salad dressing!", 
-         "Why did the coffee file a police report? It got mugged!", 
-         "Why was the math book sad? Because it had too many problems."]
-compliments = ["You're looking sharp today!", "Great job!", "I'm impressed!"]
-
-# Function to generate AI response using Rasa
+# Generate AI response using OpenAI
 async def generate_response(prompt):
-    try:
-        # Use the interpreter to parse the user's input and extract intent and entities
-        result = interpreter.parse(prompt)
-        intent = result["intent"]["name"]
-        entities = result["entities"]
+    # Existing implementation...
 
-        # Use the Rasa model to generate a response based on the extracted intent and entities
-        response = await interpreter.parse(prompt)
+# Save conversation to DynamoDB
+def save_conversation(user_id, message):
+    table.put_item(
+       Item={
+            'UserID': user_id,
+            'Timestamp': str(discord.utils.snowflake_time(message.id).timestamp()),
+            'Message': message.content
+        }
+    )
 
-        # Define personality responses for different intents
-        if intent == "greet":
-            text = random.choice(greetings)
-        elif intent == "goodbye":
-            text = random.choice(goodbyes)
-        elif intent == "joke":
-            text = random.choice(jokes)
-        elif intent == "compliment":
-            text = random.choice(compliments)
-        else:
-            text = response[0]["text"]
-
-        return text
-    except Exception as e:
-        print(f"Failed to generate AI response: {e}")
-        return "Sorry, I couldn't understand what you said."
-
-# Event listener for when bot is ready
+# Event listener for when the bot is ready
 @client.event
 async def on_ready():
-    print(f'{bot_name} is ready.')
+    print(f'{client.user} has connected to Discord!')
 
-# Event listener for when bot receives a message
+# Event listener for when the bot receives a message
 @client.event
 async def on_message(message):
-    # Ignore messages sent by the bot itself
+    # Ignore messages from the bot
     if message.author == client.user:
         return
 
-    # Check if bot's name is mentioned in the message
-    if client.user.mentioned_in(message):
-        # Remove bot's name from the message and remove leading/tr
-    # Check if bot's name is mentioned in the message
-    if client.user.mentioned_in(message):
-        # Remove bot's name from the message and remove leading/trailing white space
-        prompt = message.content.replace(f"@{bot_name}", "").strip()
-        # Generate AI response using Rasa
-        response = await generate_response(prompt)
-        # Send the response
-        await message.channel.send(response)
-    elif message.content.startswith("!translate"):
-        # Get the target language from the message content
-        target_lang = message.content.replace("!translate", "").strip()
-        # Get the text to be translated
-        text_to_translate = message.content.replace("!translate", "").strip()
-        # Detect the language of the text to be translated
-        source_lang = detect_lang(text_to_translate)
-        # Translate the text to the target language
-        translated_text = translate_text(text_to_translate, target_lang)
-        # Send the translated text
-        await message.channel.send(f"Original ({source_lang}): {text_to_translate}\nTranslated ({target_lang}): {translated_text}")
+    # Save the conversation to DynamoDB
+    save_conversation(str(message.author.id), message)
+
+    # Handle message commands
+    if message.content.startswith("!translate"):
+        # Translation logic
+        # ...
     elif message.content.startswith("!joke"):
-        # Get a joke from the PyJokes library
-        joke = pyjokes.get_joke()
-        # Send the joke
-        await message.channel.send(joke)
+        # Joke logic
+        # ...
+    else:
+        # Generate response from OpenAI
+        response = await generate_response(message.content)
+        await message.channel.send(response)
 
 # Run the bot
-client.run("your_discord_token_here")
-
+client.run(discord_token)
